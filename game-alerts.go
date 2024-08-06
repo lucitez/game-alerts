@@ -61,7 +61,6 @@ func sendGameAlert(context.Context, cloudevents.Event) error {
 	}
 
 	slog.Info("Email send success", "game", nextGame)
-	slog.Error("Test error slog", "error", errors.New("test error"))
 	return nil
 }
 

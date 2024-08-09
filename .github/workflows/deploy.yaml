@@ -1,0 +1,19 @@
+name: Deploy Cloud Function
+on:
+  push:
+    branches:
+      - main
+jobs:
+  Deploy-Cloud-Function:
+    runs on: macos-latest
+    steps:
+      - name: Checking out repository
+        uses: actions/checkout@v4
+      - run: echo "Deploying cloud function"
+      - run: |
+        gcloud functions deploy SendGameAlert \
+          --gen2 \
+          --region=us-west1 \
+          --runtime=go122 \
+          --entry-point=SendGameAlert \
+          --trigger-topic=game-alerts

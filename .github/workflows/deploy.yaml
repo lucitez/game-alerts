@@ -5,7 +5,7 @@ on:
       - main
 jobs:
   Deploy-Cloud-Function:
-    runs on: macos-latest
+    runs-on: macos-latest
     steps:
       - name: Checking out repository
         uses: actions/checkout@v4

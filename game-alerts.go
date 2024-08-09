@@ -3,11 +3,9 @@ package gamealerts
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
-	"net/smtp"
 	"os"
 	"regexp"
 	"strings"
@@ -15,31 +13,14 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"github.com/lucitez/game-alerts/internal/emailer"
+	"github.com/lucitez/game-alerts/internal/logger"
 )
 
 func init() {
 	functions.CloudEvent("SendGameAlert", sendGameAlert)
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{ReplaceAttr: replacer}))
-	slog.SetDefault(logger)
-}
-
-func replacer(groups []string, a slog.Attr) slog.Attr {
-	// Rename attribute keys to match Cloud Logging structured log format
-	switch a.Key {
-	case slog.LevelKey:
-		a.Key = "severity"
-		// Map slog.Level string values to Cloud Logging LogSeverity
-		// https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#LogSeverity
-		if level := a.Value.Any().(slog.Level); level == slog.LevelWarn {
-			a.Value = slog.StringValue("WARNING")
-		}
-	case slog.TimeKey:
-		a.Key = "timestamp"
-	case slog.MessageKey:
-		a.Key = "message"
-	}
-	return a
+	logger.Init()
 }
 
 func sendGameAlert(context.Context, cloudevents.Event) error {
@@ -48,13 +29,12 @@ func sendGameAlert(context.Context, cloudevents.Event) error {
 		slog.Error("error getting the next game", "error", err)
 		return err
 	}
-
 	if nextGame == (Game{}) {
 		slog.Info("Next game has not been posted yet")
-		return errors.New("next game has not been posted yet")
+		return nil
 	}
 
-	err = sendEmail(nextGame)
+	err = sendGameAlertEmail(nextGame)
 	if err != nil {
 		slog.Error("error sending email", "error", err, "game", nextGame)
 		return err
@@ -71,12 +51,6 @@ type Game struct {
 	Location string    `json:"location"`
 }
 
-func (g Game) String() string {
-	field, _ := g.Field()
-
-	return fmt.Sprintf("Date: %s; Field: %s", g.Start.String(), field)
-}
-
 func (g Game) Field() (string, error) {
 	re := regexp.MustCompile(`^.+ - (.+)$`)
 	matches := re.FindStringSubmatch(g.Location)
@@ -89,6 +63,7 @@ func (g Game) Field() (string, error) {
 func getNextGame() (Game, error) {
 	leagueId := os.Getenv("LEAGUE_ID")
 	seasonId := os.Getenv("SEASON_ID")
+
 	url := fmt.Sprintf("https://teampages.com/leagues/%s/events.json?calendar=true&season_id=%s", leagueId, seasonId)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -105,6 +80,7 @@ func getNextGame() (Game, error) {
 	var nextGame Game
 	teamName := os.Getenv("TEAM_NAME")
 
+	// Games are sorted chronologically. The first game after now() is the next game
 	for _, game := range games {
 		if game.HomeTeam != teamName && game.AwayTeam != teamName {
 			continue
@@ -119,22 +95,22 @@ func getNextGame() (Game, error) {
 	return nextGame, nil
 }
 
-// https://pkg.go.dev/net/smtp#example-SendMail
-func sendEmail(game Game) error {
+func sendGameAlertEmail(game Game) error {
 	fromEmail := os.Getenv("FROM_EMAIL")
 	toEmail := os.Getenv("TO_EMAIL")
 	appPass := os.Getenv("APP_PASS")
 	leagueId := os.Getenv("LEAGUE_ID")
 	seasonId := os.Getenv("SEASON_ID")
 
-	auth := smtp.PlainAuth("", fromEmail, appPass, "smtp.gmail.com")
-
 	field, err := game.Field()
 	if err != nil {
 		return err
 	}
 
-	msg := fmt.Sprintf(
+	e := emailer.New(fromEmail, toEmail, appPass)
+
+	subject := "Co-ed soccer game"
+	body := fmt.Sprintf(
 		"Like if you're playing on %s, %s %d at %s (%s field)\r\n\r\n"+
 			"https://teampages.com/leagues/%s/events?season_id=%s?view_mode=list",
 		game.Start.Weekday().String(),
@@ -146,13 +122,6 @@ func sendEmail(game Game) error {
 		seasonId,
 	)
 
-	fullMsg := []byte(
-		"Subject: Co-ed soccer game\r\n\r\n" + msg)
-
-	err = smtp.SendMail("smtp.gmail.com:587", auth, fromEmail, []string{toEmail}, fullMsg)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	err = e.SendEmail(subject, body)
+	return err
 }

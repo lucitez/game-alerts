@@ -16,8 +16,8 @@ func New() Emailer {
 	testEmail := os.Getenv("TEST_EMAIL")
 	password := os.Getenv("SFTP_PASS")
 
-	slog.Debug("Printing email", "from email", fromEmail)
-	slog.Debug("Printing email", "test email", testEmail)
+	slog.Info("Printing email", "from email", fromEmail)
+	slog.Info("Printing email", "test email", testEmail)
 
 	return Emailer{
 		fromEmail: fromEmail,

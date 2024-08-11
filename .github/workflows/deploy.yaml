@@ -23,7 +23,7 @@ jobs:
           name: "SendGameAlert"
           runtime: "go122"
           region: "us-west1"
-          build_environment_variables: |-
+          environment_variables: |-
             SFTP_PASS=${{ secrets.SFTP_PASS }}
             SENDER_EMAIL=${{ secrets.SENDER_EMAIL }}
             TO_EMAIL=${{ secrets.TO_EMAIL }}

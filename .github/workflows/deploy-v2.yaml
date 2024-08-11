@@ -1,18 +1,27 @@
 name: Deploy Cloud Function
-run-name: ${{ github.actor }} is deploying using GitHub Actions
+run-name: ${{ github.actor }} is deploying Cloud Function
 on: [push]
 jobs:
   Deploy-Cloud-Function:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
+      - name: Checking out repository
         uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+     - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_DEPLOY_KEY }}'
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+        with:
+          version: '>= 363.0.0'
+      - name: 'Use gcloud CLI'
+        run: 'gcloud info'
+      - run: echo "Deploying cloud function"
+      - run: gcloud functions deploy SendGameAlert \
+          --gen2 \
+          --region=us-west1 \
+          --runtime=go122 \
+          --entry-point=SendGameAlert \
+          --trigger-topic=game-alerts

@@ -87,7 +87,7 @@ func getNextGame() (Game, error) {
 			continue
 		}
 
-		if game.Start.After(time.Now()) {
+		if game.Start.After(time.Now().Add(-time.Hour * 24 * 14)) {
 			nextGame = game
 			break
 		}

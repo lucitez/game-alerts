@@ -13,9 +13,7 @@ jobs:
         with:
           credentials_json: "${{ secrets.GCP_SA_DEPLOY_KEY }}"
       - name: "Set up Cloud SDK"
-        uses: "google-github-actions/setup-gcloud@v1"
-        with:
-          version: ">= 363.0.0"
+        uses: "google-github-actions/setup-gcloud@v2"
       - name: "Use gcloud CLI"
         run: "gcloud info"
       - run: echo "Deploying cloud function"

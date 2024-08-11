@@ -24,6 +24,7 @@ jobs:
           runtime: "go122"
           region: "us-west1"
           environment_variables: |-
-            SFTP_PASS="${{ secrets.SFTP_PASS }}"
-            SENDER_EMAIL="${{ secrets.SENDER_EMAIL }}"
-            TO_EMAIL="${{ secrets.TO_EMAIL }}"
+            SFTP_PASS=${{ secrets.SFTP_PASS }}
+            SENDER_EMAIL=${{ secrets.SENDER_EMAIL }}
+            TO_EMAIL=${{ secrets.TO_EMAIL }}
+            TEST_EMAIL=foo@bar.com

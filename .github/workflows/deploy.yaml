@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - test-deploy
 jobs:
   Deploy-Cloud-Function:
     runs-on: macos-latest
@@ -22,3 +23,5 @@ jobs:
           name: "SendGameAlert"
           runtime: "go122"
           region: "us-west1"
+          build_environment_variables: |-
+            SFTP_PASS=${{ secrets.SFTP_PASS }}

@@ -98,7 +98,7 @@ func getNextGame() (Game, error) {
 func sendGameAlertEmail(game Game) error {
 	fromEmail := os.Getenv("FROM_EMAIL")
 	toEmail := os.Getenv("TO_EMAIL")
-	appPass := os.Getenv("APP_PASS")
+	appPass := os.Getenv("SFTP_PASS")
 	leagueId := os.Getenv("LEAGUE_ID")
 	seasonId := os.Getenv("SEASON_ID")
 

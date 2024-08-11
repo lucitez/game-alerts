@@ -1,10 +1,6 @@
 name: Deploy Cloud Function
-run-name: Deploying commit ${{ github.event.head_commit.message }}
-on:
-  push:
-    branches:
-      - main
-      - test-deploy
+run-name: Deploying
+on: [push]
 jobs:
   Deploy-Cloud-Function:
     runs-on: macos-latest

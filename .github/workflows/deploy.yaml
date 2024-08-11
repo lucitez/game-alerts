@@ -1,21 +1,19 @@
 name: Deploy Cloud Function
-run-name: Deploying
-on: [push]
+on:
+  push:
+    branches:
+      - main
 jobs:
-  Deploy-Cloud-Function-Test:
+  Deploy-Cloud-Function:
     runs-on: macos-latest
+    timeout-minutes: 10
     steps:
       - name: Checking out repository
         uses: actions/checkout@v4
-      - id: "auth"
-        name: "Authenticate to Google Cloud"
+      - name: "Authenticate to Google Cloud"
         uses: "google-github-actions/auth@v2"
         with:
           credentials_json: "${{ secrets.GCP_SA_DEPLOY_KEY }}"
-      - name: "Set up Cloud SDK"
-        uses: "google-github-actions/setup-gcloud@v2"
-      - name: "Use gcloud CLI"
-        run: "gcloud info"
       - run: echo "Deploying cloud function"
       - name: "Deploy"
         timeout-minutes: 5
@@ -24,9 +22,3 @@ jobs:
           name: "SendGameAlert"
           runtime: "go122"
           region: "us-west1"
-      # - run: gcloud functions deploy SendGameAlert \
-      #     --gen2 \
-      #     --region=us-west1 \
-      #     --runtime=go122 \
-      #     --entry-point=SendGameAlert \
-      #     --trigger-topic=game-alerts

@@ -24,6 +24,8 @@ jobs:
           entry_point: "SendGameAlert"
           runtime: "go122"
           region: "us-west1"
+          environment: "GEN_2"
+          event_trigger_type: "google.pubsub.topic.publish"
           event_trigger_pubsub_topic: "projects/game-alerts-431604/topics/game-alerts"
           service_account: ${{ secrets.GCP_DEFAULT_COMPUTE_SA_EMAIL }}
           environment_variables: "FOO=BAR,BAZ=BAT,THIS=${{ secrets.TO_EMAIL }}"

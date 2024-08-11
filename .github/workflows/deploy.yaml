@@ -20,7 +20,10 @@ jobs:
         timeout-minutes: 5
         uses: "google-github-actions/deploy-cloud-functions@v3"
         with:
-          name: "SendGameAlert"
+          name: "SendGameAlertV2"
+          entry_point: "SendGameAlert"
           runtime: "go122"
           region: "us-west1"
+          event_trigger_pubsub_topic: "projects/game-alerts-431604/topics/game-alerts"
+          service_account: ${{ secrets.GCP_DEFAULT_COMPUTE_SA_EMAIL }}
           environment_variables: "FOO=BAR,BAZ=BAT,THIS=${{ secrets.TO_EMAIL }}"

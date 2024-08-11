@@ -60,11 +60,13 @@ func (g Game) Field() (string, error) {
 	return strings.ToLower(re.FindStringSubmatch(g.Location)[1]), nil
 }
 
-func getNextGame() (Game, error) {
-	leagueId := os.Getenv("LEAGUE_ID")
-	seasonId := os.Getenv("SEASON_ID")
+// TODO get these from db
+const LEAGUE_ID = "54397"
+const SEASON_ID = "2146954"
+const TEAM_NAME = "HOW I MEGGED YOUR MOTHER"
 
-	url := fmt.Sprintf("https://teampages.com/leagues/%s/events.json?calendar=true&season_id=%s", leagueId, seasonId)
+func getNextGame() (Game, error) {
+	url := fmt.Sprintf("https://teampages.com/leagues/%s/events.json?calendar=true&season_id=%s", LEAGUE_ID, SEASON_ID)
 	resp, err := http.Get(url)
 	if err != nil {
 		return Game{}, err
@@ -78,11 +80,10 @@ func getNextGame() (Game, error) {
 	}
 
 	var nextGame Game
-	teamName := os.Getenv("TEAM_NAME")
 
 	// Games are sorted chronologically. The first game after now() is the next game
 	for _, game := range games {
-		if game.HomeTeam != teamName && game.AwayTeam != teamName {
+		if game.HomeTeam != TEAM_NAME && game.AwayTeam != TEAM_NAME {
 			continue
 		}
 
@@ -96,18 +97,14 @@ func getNextGame() (Game, error) {
 }
 
 func sendGameAlertEmail(game Game) error {
-	fromEmail := os.Getenv("FROM_EMAIL")
 	toEmail := os.Getenv("TO_EMAIL")
-	appPass := os.Getenv("APP_PASS")
-	leagueId := os.Getenv("LEAGUE_ID")
-	seasonId := os.Getenv("SEASON_ID")
 
 	field, err := game.Field()
 	if err != nil {
 		return err
 	}
 
-	e := emailer.New(fromEmail, toEmail, appPass)
+	e := emailer.New()
 
 	subject := "Co-ed soccer game"
 	body := fmt.Sprintf(
@@ -118,10 +115,10 @@ func sendGameAlertEmail(game Game) error {
 		game.Start.Day(),
 		game.Start.Format(time.Kitchen),
 		field,
-		leagueId,
-		seasonId,
+		LEAGUE_ID,
+		SEASON_ID,
 	)
 
-	err = e.SendEmail(subject, body)
+	err = e.SendEmail(toEmail, subject, body)
 	return err
 }

@@ -98,8 +98,6 @@ func getNextGame() (Game, error) {
 
 func sendGameAlertEmail(game Game) error {
 	toEmail := os.Getenv("TO_EMAIL")
-	leagueId := os.Getenv("LEAGUE_ID")
-	seasonId := os.Getenv("SEASON_ID")
 
 	field, err := game.Field()
 	if err != nil {
@@ -117,8 +115,8 @@ func sendGameAlertEmail(game Game) error {
 		game.Start.Day(),
 		game.Start.Format(time.Kitchen),
 		field,
-		leagueId,
-		seasonId,
+		LEAGUE_ID,
+		SEASON_ID,
 	)
 
 	err = e.SendEmail(toEmail, subject, body)

@@ -2,7 +2,7 @@ name: Deploy Cloud Function
 run-name: Deploying
 on: [push]
 jobs:
-  Deploy-Cloud-Function:
+  Deploy-Cloud-Function-Test:
     runs-on: macos-latest
     steps:
       - name: Checking out repository

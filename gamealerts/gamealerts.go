@@ -11,11 +11,19 @@ import (
 	"strings"
 	"time"
 
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/lucitez/game-alerts/internal/emailer"
+	"github.com/lucitez/game-alerts/internal/logger"
 )
 
-func SendGameAlert(context.Context, cloudevents.Event) error {
+func init() {
+	functions.CloudEvent("SendGameAlert", sendGameAlert)
+
+	logger.Init()
+}
+
+func sendGameAlert(context.Context, cloudevents.Event) error {
 	nextGame, err := getNextGame()
 	if err != nil {
 		slog.Error("error getting the next game", "error", err)

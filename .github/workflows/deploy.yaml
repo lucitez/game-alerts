@@ -34,3 +34,4 @@ jobs:
             SFTP_PASS=${{ secrets.SFTP_PASS }}
             SENDER_EMAIL=${{ secrets.SENDER_EMAIL }}
             TO_EMAIL=${{ secrets.TO_EMAIL }}
+            ENV=prod

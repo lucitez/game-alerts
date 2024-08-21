@@ -1,19 +1,29 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"os"
 
-	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/lucitez/game-alerts/gamealerts"
-	"github.com/lucitez/game-alerts/internal/logger"
+	_ "github.com/lucitez/game-alerts/gamealerts"
+
+	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
 )
 
-func init() {
-	functions.CloudEvent("SendGameAlert", gamealerts.SendGameAlert)
-
-	logger.Init()
-}
-
 func main() {
-	fmt.Println("hello")
+	// Use PORT environment variable, or default to 8080.
+	port := "8080"
+	if envPort := os.Getenv("PORT"); envPort != "" {
+		port = envPort
+	}
+
+	// By default, listen on all interfaces. If testing locally, run with
+	// LOCAL_ONLY=true to avoid triggering firewall warnings and
+	// exposing the server outside of your own machine.
+	hostname := ""
+	if localOnly := os.Getenv("LOCAL_ONLY"); localOnly == "true" {
+		hostname = "127.0.0.1"
+	}
+	if err := funcframework.StartHostPort(hostname, port); err != nil {
+		log.Fatalf("funcframework.StartHostPort: %v\n", err)
+	}
 }

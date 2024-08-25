@@ -1,6 +1,6 @@
 module github.com/lucitez/game-alerts
 
-go 1.23.0
+go 1.22.0
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.9.0

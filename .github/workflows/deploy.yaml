@@ -22,7 +22,7 @@ jobs:
         with:
           name: "SendGameAlert"
           entry_point: "SendGameAlert"
-          runtime: "go122"
+          runtime: "go123"
           region: "us-west1"
           environment: "GEN_2"
           event_trigger_location: "us-west1"

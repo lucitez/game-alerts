@@ -1,13 +1,32 @@
 # TODOS
 
-- Containerize
-- Provision the deployment
-- Create db and check if i've already sent this alert
+- Add env vars and secrets to the container
+- Create a database to check who has subscriptions and don't send the same email twice
+- Build support for sending emails to multiple coaches
 - Write tests
-- Add a database to store coaches emails, league id, etc.
-- Build support for sending emails to different coaches.
 
+### Eventually
+- Use terraform to provision cloud function, db, etc
+
+# Development
+
+Spin up the database and cloud function containers using docker compose:
+```shell
+$ docker compose up
 ```
+
+Seed the database:
+```shell
+$ psql -h localhost -U postgres -w pwd -d game_alerts -f seed.sql
+```
+
+Connect to the database:
+```shell
+$ psql -h localhost -U postgres -w pwd -d game_alerts
+```
+
+Curl the cloud function:
+```shell
 curl --location 'localhost:8080' \
 --header 'Content-Type: application/json' \
 --header 'ce-id: 123451234512345' \

@@ -1,0 +1,21 @@
+services:
+  function:
+    build: .
+    ports:
+      - "8080:8080"
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app
+  db:
+    image: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=pwd
+
+volumes:
+  pgdata:

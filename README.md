@@ -10,7 +10,7 @@
 
 # Development
 
-Spin up the database and cloud function containers using docker compose:
+Spin up the database container using docker compose:
 ```shell
 $ docker compose up
 ```
@@ -25,6 +25,9 @@ Connect to the database:
 $ psql -h localhost -U postgres -w pwd -d game_alerts
 ```
 
+Start Cloud Function:
+`FUNCTION_TARGET=SendGameAlert LOCAL_ONLY=true go run ./cmd/main.go`
+
 Curl the cloud function:
 ```shell
 curl --location 'localhost:8080' \
@@ -36,3 +39,7 @@ curl --location 'localhost:8080' \
 --header 'ce-source: //pubsub.googleapis.com/projects/game-alerts-431604/topics/game-alerts' \
 --data '{}'
 ```
+
+# Helpful Docs
+
+- [Functions Framework Go](https://github.com/GoogleCloudPlatform/functions-framework-go)

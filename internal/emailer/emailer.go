@@ -12,7 +12,7 @@ type Emailer struct {
 }
 
 func New() Emailer {
-	fromEmail := os.Getenv("SENDER_EMAIL")
+	fromEmail := os.Getenv("SFTP_EMAIL")
 	password := os.Getenv("SFTP_PASS")
 
 	return Emailer{

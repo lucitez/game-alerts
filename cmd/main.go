@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"log/slog"
 	"os"
 
 	_ "github.com/lucitez/game-alerts"
@@ -23,6 +24,7 @@ func main() {
 	if localOnly := os.Getenv("LOCAL_ONLY"); localOnly == "true" {
 		hostname = "127.0.0.1"
 	}
+	slog.Info("STARTING SERVER", "port", port, "hostname", hostname)
 	if err := funcframework.StartHostPort(hostname, port); err != nil {
 		log.Fatalf("funcframework.StartHostPort: %v\n", err)
 	}

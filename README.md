@@ -17,7 +17,7 @@ $ docker compose up
 
 Seed the database:
 ```shell
-$ psql -h localhost -U postgres -w pwd -d game_alerts -f seed.sql
+$ psql -h localhost -U postgres -d game_alerts -f seed.sql
 ```
 
 Connect to the database:
@@ -26,7 +26,7 @@ $ psql -h localhost -U postgres -w pwd -d game_alerts
 ```
 
 Start Cloud Function:
-`FUNCTION_TARGET=SendGameAlert LOCAL_ONLY=true go run ./cmd/main.go`
+`FUNCTION_TARGET=SendGameAlerts LOCAL_ONLY=true go run ./cmd/main.go`
 
 Curl the cloud function:
 ```shell

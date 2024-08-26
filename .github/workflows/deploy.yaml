@@ -20,8 +20,8 @@ jobs:
         timeout-minutes: 5
         uses: "google-github-actions/deploy-cloud-functions@v3"
         with:
-          name: "SendGameAlert"
-          entry_point: "SendGameAlert"
+          name: "SendGameAlerts"
+          entry_point: "SendGameAlerts"
           runtime: "go122"
           region: "us-west1"
           environment: "GEN_2"

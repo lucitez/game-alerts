@@ -1,8 +1,6 @@
 # TODOS
 
-- Add env vars and secrets to the container
-- Create a database to check who has subscriptions and don't send the same email twice
-- Build support for sending emails to multiple coaches
+- Add sql support to production
 - Write tests
 
 ### Eventually

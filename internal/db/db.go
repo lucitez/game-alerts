@@ -2,7 +2,9 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
+	"os"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -11,6 +13,25 @@ import (
 
 type Database struct {
 	conn *pgx.Conn
+}
+
+func buildDatabaseURL() string {
+	return "TODO"
+}
+
+func CreateConnection(ctx context.Context) (*pgx.Conn, error) {
+	conn, err := pgx.Connect(ctx, os.Getenv("DATABASE_URL"))
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize db driver: %w", err)
+	}
+	defer conn.Close(context.Background())
+
+	err = conn.Ping(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to ping db: %w", err)
+	}
+
+	return conn, nil
 }
 
 func New(conn *pgx.Conn) Database {

@@ -3,14 +3,12 @@ package gamealerts
 import (
 	"context"
 	"log/slog"
-	"os"
-
-	"github.com/jackc/pgx/v5"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/lucitez/game-alerts/internal/alerter"
 	"github.com/lucitez/game-alerts/internal/db"
+	"github.com/lucitez/game-alerts/internal/emailer"
 	"github.com/lucitez/game-alerts/internal/logger"
 )
 
@@ -21,33 +19,32 @@ func init() {
 }
 
 func sendGameAlerts(ctx context.Context, event cloudevents.Event) error {
-	conn, err := pgx.Connect(ctx, os.Getenv("DATABASE_URL"))
-	if err != nil {
-		slog.Error("failed to initialize db driver", "error", err)
-		return err
-	}
-	defer conn.Close(context.Background())
+	slog.Info("starting send game alerts function")
 
-	err = conn.Ping(ctx)
+	slog.Info("connecting to db")
+	conn, err := db.CreateConnection(ctx)
 	if err != nil {
-		slog.Error("failed to start up db", "error", err)
-		return err
+		slog.Error("failed to create database connection", "error", err)
 	}
 
 	db := db.New(conn)
 
+	slog.Info("getting active subscriptions")
 	subscriptions, err := db.GetSubscriptions(ctx)
 	if err != nil {
 		slog.Error("failed to get active subscriptions", "error", err)
 		return err
 	}
 
-	a := alerter.New(db)
+	emailer := emailer.New()
+	alerter := alerter.New(db, emailer)
 
+	slog.Info("sending game alerts")
 	for _, subscription := range subscriptions {
-		err := a.SendGameAlert(ctx, subscription)
+		err := alerter.SendGameAlert(ctx, subscription)
 		if err != nil {
 			slog.Error("failed to send game alert", "error", err)
+			continue
 		}
 		slog.Info("Finished sending game alert", "subscription", subscription)
 	}

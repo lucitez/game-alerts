@@ -16,12 +16,14 @@ import (
 )
 
 type Alerter struct {
-	db db.Database
+	db      db.Database
+	emailer emailer.Emailer
 }
 
-func New(db db.Database) Alerter {
+func New(db db.Database, emailer emailer.Emailer) Alerter {
 	return Alerter{
-		db: db,
+		db:      db,
+		emailer: emailer,
 	}
 }
 
@@ -44,7 +46,7 @@ func (a Alerter) SendGameAlert(ctx context.Context, subscription models.Subscrip
 		return nil
 	}
 
-	err = sendGameAlertEmail(nextGame, subscription)
+	err = a.sendGameAlertEmail(nextGame, subscription)
 	if err != nil {
 		return fmt.Errorf("failed to send game alert email: %w", err)
 	}
@@ -93,13 +95,13 @@ func getNextGame(subscription models.Subscription) (Game, error) {
 
 	var nextGame Game
 
-	// Games are sorted chronologically. The first game after now() is the next game
+	// Games are sorted chronologically. The first game after time.Now() is the next game
 	for _, game := range games {
 		if game.HomeTeam != teamName && game.AwayTeam != teamName {
 			continue
 		}
 
-		if game.Start.After(time.Now().Add(-time.Hour * 24 * 30)) {
+		if game.Start.After(time.Now()) {
 			nextGame = game
 			break
 		}
@@ -108,17 +110,15 @@ func getNextGame(subscription models.Subscription) (Game, error) {
 	return nextGame, nil
 }
 
-func sendGameAlertEmail(game Game, subscription models.Subscription) error {
+func (a Alerter) sendGameAlertEmail(game Game, subscription models.Subscription) error {
 	field, err := game.Field()
 	if err != nil {
 		return err
 	}
 
-	e := emailer.New()
-
 	subject := "Co-ed soccer game"
 	body := fmt.Sprintf(
-		"Like if you're playing on %s, %s %d at %s (%s field)\r\n\r\n"+
+		"Like if you're playing on %s, %s %d at %s (%s field)\r\n"+
 			"https://teampages.com/leagues/%s/events?season_id=%s?view_mode=list",
 		game.Start.Weekday().String(),
 		game.Start.Month().String(),
@@ -129,6 +129,6 @@ func sendGameAlertEmail(game Game, subscription models.Subscription) error {
 		subscription.SeasonID,
 	)
 
-	err = e.SendEmail(subscription.Coach.Email, subject, body)
+	err = a.emailer.SendEmail(subscription.Coach.Email, subject, body)
 	return err
 }

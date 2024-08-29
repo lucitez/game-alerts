@@ -20,7 +20,7 @@ $ psql -h localhost -U postgres -d game_alerts -f seed.sql
 
 Connect to the database:
 ```shell
-$ psql -h localhost -U postgres -w pwd -d game_alerts
+$ psql -h localhost -U postgres -d game_alerts
 ```
 
 Start Cloud Function:

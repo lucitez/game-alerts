@@ -1,6 +1,7 @@
 package alerter
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -9,25 +10,48 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lucitez/game-alerts/internal/db"
 	"github.com/lucitez/game-alerts/internal/emailer"
 	"github.com/lucitez/game-alerts/internal/models"
 )
 
-func SendGameAlert(subscription models.Subscription) error {
+type Alerter struct {
+	db db.Database
+}
+
+func New(db db.Database) Alerter {
+	return Alerter{
+		db: db,
+	}
+}
+
+func (a Alerter) SendGameAlert(ctx context.Context, subscription models.Subscription) error {
 	nextGame, err := getNextGame(subscription)
 	if err != nil {
-		slog.Error("error getting the next game", "error", err)
-		return err
+		return fmt.Errorf("failed to get the next game: %w", err)
 	}
 	if nextGame == (Game{}) {
 		slog.Info("Next game has not been posted yet")
 		return nil
 	}
 
+	hasSentAlert, err := a.db.HasSentAlert(ctx, subscription.ID, nextGame.Start)
+	if err != nil {
+		return fmt.Errorf("failed to get hasSentAlert: %w", err)
+	}
+	if hasSentAlert {
+		slog.Info("Already sent game alert", "nextGame", nextGame)
+		return nil
+	}
+
 	err = sendGameAlertEmail(nextGame, subscription)
 	if err != nil {
-		slog.Error("error sending email", "error", err, "game", nextGame)
-		return err
+		return fmt.Errorf("failed to send game alert email: %w", err)
+	}
+
+	err = a.db.CreateSentAlert(ctx, subscription.ID, nextGame.Start)
+	if err != nil {
+		return fmt.Errorf("failed to create sent alert: %w", err)
 	}
 
 	return nil

@@ -23,14 +23,14 @@ func init() {
 func sendGameAlerts(ctx context.Context, event cloudevents.Event) error {
 	conn, err := pgx.Connect(ctx, os.Getenv("DATABASE_URL"))
 	if err != nil {
-		slog.Error("error initializing db driver", "error", err)
+		slog.Error("failed to initialize db driver", "error", err)
 		return err
 	}
 	defer conn.Close(context.Background())
 
 	err = conn.Ping(ctx)
 	if err != nil {
-		slog.Error("error pinging db", "error", err)
+		slog.Error("failed to start up db", "error", err)
 		return err
 	}
 
@@ -38,17 +38,18 @@ func sendGameAlerts(ctx context.Context, event cloudevents.Event) error {
 
 	subscriptions, err := db.GetSubscriptions(ctx)
 	if err != nil {
-		slog.Error("error getting active subscriptions", "error", err)
+		slog.Error("failed to get active subscriptions", "error", err)
 		return err
 	}
 
-	slog.Info("got subscriptions", "subscriptions", subscriptions)
+	a := alerter.New(db)
 
 	for _, subscription := range subscriptions {
-		err := alerter.SendGameAlert(subscription)
+		err := a.SendGameAlert(ctx, subscription)
 		if err != nil {
-			slog.Info("error sending game alert", "error", err)
+			slog.Error("failed to send game alert", "error", err)
 		}
+		slog.Info("Finished sending game alert", "subscription", subscription)
 	}
 
 	slog.Info("Finished sending game alerts")

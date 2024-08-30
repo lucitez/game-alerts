@@ -26,6 +26,7 @@ func sendGameAlerts(ctx context.Context, event cloudevents.Event) error {
 	if err != nil {
 		slog.Error("failed to create database connection", "error", err)
 	}
+	defer conn.Close(context.Background())
 
 	db := db.New(conn)
 

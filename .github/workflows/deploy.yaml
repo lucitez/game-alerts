@@ -39,6 +39,6 @@ jobs:
             DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
             DATABASE_HOST=${{ secrets.DATABASE_HOST }}
             DATABASE_NAME=postgres
-            DATABASE_PORT=6543
+            DATABASE_PORT=5432
 
 

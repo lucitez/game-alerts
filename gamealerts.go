@@ -2,6 +2,7 @@ package gamealerts
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -24,7 +25,7 @@ func sendGameAlerts(ctx context.Context, event cloudevents.Event) error {
 	slog.Info("connecting to db")
 	conn, err := db.CreateConnection(ctx)
 	if err != nil {
-		slog.Error("failed to create database connection", "error", err)
+		return fmt.Errorf("failed to create database connection: %w", err)
 	}
 	defer conn.Close(context.Background())
 
@@ -33,8 +34,7 @@ func sendGameAlerts(ctx context.Context, event cloudevents.Event) error {
 	slog.Info("getting active subscriptions")
 	subscriptions, err := db.GetSubscriptions(ctx)
 	if err != nil {
-		slog.Error("failed to get active subscriptions", "error", err)
-		return err
+		return fmt.Errorf("failed to get active subscriptions: %w", err)
 	}
 
 	emailer := emailer.New()
@@ -44,7 +44,7 @@ func sendGameAlerts(ctx context.Context, event cloudevents.Event) error {
 	for _, subscription := range subscriptions {
 		err := alerter.SendGameAlert(ctx, subscription)
 		if err != nil {
-			slog.Error("failed to send game alert", "error", err)
+			slog.Error("failed to send game alert", "error", err, "subscription", subscription)
 			continue
 		}
 		slog.Info("Finished sending game alert", "subscription", subscription)

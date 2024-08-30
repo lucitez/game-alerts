@@ -30,7 +30,6 @@ func CreateConnection(ctx context.Context) (*pgx.Conn, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize db driver: %w", err)
 	}
-	defer conn.Close(context.Background())
 
 	err = conn.Ping(ctx)
 	if err != nil {

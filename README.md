@@ -24,7 +24,7 @@ $ psql -h localhost -U postgres -d game_alerts
 ```
 
 Start Cloud Function:
-`FUNCTION_TARGET=SendGameAlerts LOCAL_ONLY=true go run ./cmd/main.go`
+`go run ./cmd/main.go`
 
 Curl the cloud function:
 ```shell

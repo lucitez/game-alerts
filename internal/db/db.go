@@ -22,7 +22,7 @@ func buildDatabaseURL() string {
 	port := os.Getenv("DATABASE_PORT")
 	name := os.Getenv("DATABASE_NAME")
 
-	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s", user, password, host, port, name)
+	return fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", user, password, host, port, name)
 }
 
 func CreateConnection(ctx context.Context) (*pgx.Conn, error) {

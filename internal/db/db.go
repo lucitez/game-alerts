@@ -16,11 +16,17 @@ type Database struct {
 }
 
 func buildDatabaseURL() string {
-	return "TODO"
+	user := os.Getenv("DATABASE_USER")
+	password := os.Getenv("DATABASE_PASSWORD")
+	host := os.Getenv("DATABASE_HOST")
+	port := os.Getenv("DATABASE_PORT")
+	name := os.Getenv("DATABASE_NAME")
+
+	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s", user, password, host, port, name)
 }
 
 func CreateConnection(ctx context.Context) (*pgx.Conn, error) {
-	conn, err := pgx.Connect(ctx, os.Getenv("DATABASE_URL"))
+	conn, err := pgx.Connect(ctx, buildDatabaseURL())
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize db driver: %w", err)
 	}

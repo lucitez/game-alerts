@@ -35,9 +35,9 @@ jobs:
             SENDER_EMAIL=${{ secrets.SENDER_EMAIL }}
             TO_EMAIL=${{ secrets.TO_EMAIL }}
             ENV=prod
-            DATABASE_USER=${{ secrets.DATABASE_USER }}
+            DATABASE_USER=postgres
             DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
-            DATABASE_HOST=${{ secrets.DATABASE_HOST }}
+            DATABASE_HOST=db.yygfhrmrtxqqpahosbkn.supabase.co
             DATABASE_NAME=postgres
             DATABASE_PORT=5432
 

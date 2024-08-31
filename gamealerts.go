@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/lucitez/game-alerts/internal/alerter"
 	"github.com/lucitez/game-alerts/internal/db"
 	"github.com/lucitez/game-alerts/internal/emailer"
@@ -14,12 +12,12 @@ import (
 )
 
 func init() {
-	functions.CloudEvent("SendGameAlerts", sendGameAlerts)
+	// functions.CloudEvent("SendGameAlerts", SendGameAlerts)
 
 	logger.Init()
 }
 
-func sendGameAlerts(ctx context.Context, event cloudevents.Event) error {
+func SendGameAlerts(ctx context.Context) error {
 	slog.Info("starting send game alerts function")
 
 	slog.Info("connecting to db")

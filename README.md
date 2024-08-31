@@ -9,19 +9,21 @@
 
 # Development
 
-Spin up the database container using docker compose:
+Spin up the supabase db container
+
 ```shell
-$ docker compose up
+$ supabase start
 ```
 
-Seed the database:
+Migrate and seed local db
 ```shell
-$ psql -h localhost -U postgres -d game_alerts -f seed.sql
+$ supabase db reset
 ```
 
-Connect to the database:
+Connect to local db
 ```shell
-$ psql -h localhost -U postgres -d game_alerts
+$ supabase status
+$ psql DB_URL
 ```
 
 Start Cloud Function:
@@ -42,3 +44,4 @@ curl --location 'localhost:8080' \
 # Helpful Docs
 
 - [Functions Framework Go](https://github.com/GoogleCloudPlatform/functions-framework-go)
+- [Supabase](https://supabase.com/docs/guides/database/overview)

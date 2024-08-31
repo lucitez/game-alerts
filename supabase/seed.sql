@@ -1,0 +1,2 @@
+INSERT INTO coaches (name, email) VALUES ('Zapp Brannigan', 'deathby@snusnu.com');
+INSERT INTO subscriptions(coach_id, league_id, season_id, team_name, active) values (1, '54397', '2146954', 'HOW I MEGGED YOUR MOTHER', true);

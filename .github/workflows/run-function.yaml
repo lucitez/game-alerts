@@ -14,6 +14,6 @@ jobs:
         uses: actions/setup-go@v5
         with: 
           go-version: '1.22'
-      - run: go run cmd/test/test.go
+      - run: go run cmd/test/test.go | jq .
       - run: go run cmd/test/test.go > test.txt
-      - run: cat test.txt
+      - run: cat test.txt | jq .

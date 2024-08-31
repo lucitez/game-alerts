@@ -14,8 +14,10 @@ jobs:
         uses: actions/setup-go@v5
         with: 
           go-version: '1.22'
+      - name: Installing dependencies
+        run: go install cmd/test/test.go
       - name: Run game alerts script
-        run: go run cmd/test/test.go > output.txt
+        run: go run cmd/test/test.go
         env:
           SFTP_PASS: ${{ secrets.SFTP_PASS }}
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
@@ -26,6 +28,4 @@ jobs:
           DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
           DATABASE_NAME: postgres
           DATABASE_PORT: 5432
-      - name: Printing output from file
-        run: cat output.txt | jq .
               

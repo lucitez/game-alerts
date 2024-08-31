@@ -1,6 +1,7 @@
 # TODOS
 
 - Add sql support to production
+- Look into scheduling and running using purely gha
 - Write tests
 
 ### Eventually

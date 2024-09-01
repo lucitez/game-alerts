@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: go install .
       - name: Run game alerts script
-        run: go run . | tee output.txt
+        run: go run . | tee -i --output-error=exit output.txt
         env:
           ENV: prod
           SFTP_PASS: ${{ secrets.SFTP_PASS }}

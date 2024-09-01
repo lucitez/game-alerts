@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+      - test-output
 jobs:
   send-game-alerts:
     runs-on: macos-latest

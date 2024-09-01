@@ -1,7 +1,8 @@
 name: Send Game Alerts
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    # This runs every 20 minutes from 8AM-10PM PST. Time here is in UTC
+    - cron: '*/20 16-23,0-6 * * *'
 jobs:
   send-game-alerts:
     runs-on: macos-latest
@@ -18,10 +19,9 @@ jobs:
       - name: Run game alerts script
         run: go run . | tee output.txt | jq .
         env:
+          ENV: prod
           SFTP_PASS: ${{ secrets.SFTP_PASS }}
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
-          TO_EMAIL: ${{ secrets.TO_EMAIL }}
-          ENV: prod
           DATABASE_USER: ${{ secrets.DATABASE_USER }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
           DATABASE_HOST: ${{ secrets.DATABASE_HOST }}

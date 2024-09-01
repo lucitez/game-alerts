@@ -21,7 +21,11 @@ jobs:
       - name: Install dependencies
         run: go install .
       - name: Run game alerts script
-        run: go run . 2>&1 | tee output.txt
+        run: exec 4<>err.txt
+        run: tail -f err.txt &
+        run: go run . 2>&4 | tee output.txt
+        run: cat err.txt
+        run: cat output.txt | jq .
         env:
           ENV: prod
           SFTP_PASS: ${{ secrets.SFTP_PASS }}

@@ -17,7 +17,9 @@ func main() {
 	err := sendGameAlerts(context.Background())
 	if err != nil {
 		slog.Error("error sending game alerts", "error", err)
+		panic(err)
 	}
+	panic("TESTING THAT WHEN THE CRON PANICS I GET AN EMAIL")
 }
 
 func sendGameAlerts(ctx context.Context) error {

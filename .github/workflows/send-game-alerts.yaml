@@ -1,0 +1,30 @@
+name: Send Game Alerts
+on:
+  schedule:
+    - cron: "0,30 8-22 * * *"
+jobs:
+  send-game-alerts:
+    runs-on: macos-latest
+    timeout-minutes: 2
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with: 
+          go-version: '1.22'
+      - name: Install dependencies
+        run: go install .
+      - name: Run game alerts script
+        run: go run . | tee output.txt | jq .
+        env:
+          SFTP_PASS: ${{ secrets.SFTP_PASS }}
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          TO_EMAIL: ${{ secrets.TO_EMAIL }}
+          ENV: prod
+          DATABASE_USER: ${{ secrets.DATABASE_USER }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+          DATABASE_NAME: postgres
+          DATABASE_PORT: 5432
+              

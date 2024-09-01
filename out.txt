@@ -1,0 +1,13 @@
+{"time":"2024-09-01T06:26:49.43271-07:00","level":"INFO","msg":"starting send game alerts function"}
+{"time":"2024-09-01T06:26:49.433035-07:00","level":"INFO","msg":"connecting to db"}
+{"time":"2024-09-01T06:26:49.451026-07:00","level":"INFO","msg":"getting active subscriptions"}
+{"time":"2024-09-01T06:26:49.453521-07:00","level":"INFO","msg":"sending game alerts"}
+{"time":"2024-09-01T06:26:50.048352-07:00","level":"INFO","msg":"next game has not been posted yet"}
+{"time":"2024-09-01T06:26:50.048411-07:00","level":"INFO","msg":"skipped sending game alert","subscription_id":1}
+{"time":"2024-09-01T06:26:50.048425-07:00","level":"INFO","msg":"finished sending game alerts"}
+panic: TESTING PANIC
+
+goroutine 1 [running]:
+main.main()
+	/Users/lucasgregory/src/game-alerts/main.go:22 +0xe0
+exit status 2

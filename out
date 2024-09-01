@@ -1,0 +1,7 @@
+{"time":"2024-09-01T06:27:47.458527-07:00","level":"INFO","msg":"starting send game alerts function"}
+{"time":"2024-09-01T06:27:47.458958-07:00","level":"INFO","msg":"connecting to db"}
+{"time":"2024-09-01T06:27:47.477054-07:00","level":"INFO","msg":"getting active subscriptions"}
+{"time":"2024-09-01T06:27:47.479454-07:00","level":"INFO","msg":"sending game alerts"}
+{"time":"2024-09-01T06:27:47.882046-07:00","level":"INFO","msg":"next game has not been posted yet"}
+{"time":"2024-09-01T06:27:47.882077-07:00","level":"INFO","msg":"skipped sending game alert","subscription_id":1}
+{"time":"2024-09-01T06:27:47.882087-07:00","level":"INFO","msg":"finished sending game alerts"}

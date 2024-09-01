@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: go install .
       - name: Run game alerts script
-        run: go run . |& tee output.txt && exit ${PIPESTATUS[0]}
+        run: go run . |& tee output.txt | jq . && exit ${PIPESTATUS[0]}
         env:
           ENV: prod
           SFTP_PASS: ${{ secrets.SFTP_PASS }}
@@ -31,4 +31,6 @@ jobs:
           DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
           DATABASE_NAME: postgres
           DATABASE_PORT: 5432
+      - name: Print output
+        run: cat output.txt
               

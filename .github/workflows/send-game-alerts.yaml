@@ -1,7 +1,7 @@
 name: Send Game Alerts
 on:
   schedule:
-    - cron: "0,30 8-22 * * *"
+    - cron: '5,35 8-22 * * *'
 jobs:
   send-game-alerts:
     runs-on: macos-latest

@@ -3,10 +3,6 @@ on:
   schedule:
     # This runs every 20 minutes from 8AM-10PM PST. Time here is in UTC
     - cron: '*/20 16-23,0-6 * * *'
-  push:
-    branches:
-      - main
-      - test-output
 jobs:
   send-game-alerts:
     runs-on: ubuntu-latest
@@ -31,7 +27,7 @@ jobs:
           DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
           DATABASE_NAME: postgres
           DATABASE_PORT: 5432
-      - name: Print output
+      - name: Send logs to aggregator
         if: always()
-        run: cat output.txt
+        run: echo "TODO"
               

@@ -1,6 +1,6 @@
 This program checks a pickup soccer league website to check if games have been scheduled, then sends emails to subscribers.
 
-# Development
+## Development
 
 Spin up the supabase db container
 
@@ -22,6 +22,6 @@ $ psql DB_URL
 Run the main function:
 `go run .`
 
-# Helpful Docs
+## Helpful Docs
 
 - [Supabase](https://supabase.com/docs/guides/database/overview)

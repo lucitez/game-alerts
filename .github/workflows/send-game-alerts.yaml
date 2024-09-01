@@ -1,9 +1,5 @@
 name: Send Game Alerts
 on:
-  push:
-    branches:
-      - main
-      - test-run-function
   schedule:
     - cron: "0,30 8-22 * * *"
 jobs:

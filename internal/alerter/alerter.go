@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"regexp"
-	"strings"
 	"time"
 
 	"github.com/lucitez/game-alerts/internal/db"
@@ -15,9 +13,13 @@ import (
 	"github.com/lucitez/game-alerts/internal/models"
 )
 
+type Emailer interface {
+	SendEmail(toEmail string, subject string, body string) error
+}
+
 type Alerter struct {
 	db      db.Database
-	emailer emailer.Emailer
+	emailer Emailer
 }
 
 func New(db db.Database, emailer emailer.Emailer) Alerter {
@@ -32,7 +34,7 @@ func (a Alerter) SendGameAlert(ctx context.Context, subscription models.Subscrip
 	if err != nil {
 		return false, fmt.Errorf("failed to get the next game: %w", err)
 	}
-	if nextGame == (Game{}) {
+	if nextGame == (models.Game{}) {
 		slog.Info("next game has not been posted yet")
 		return false, nil
 	}
@@ -46,7 +48,7 @@ func (a Alerter) SendGameAlert(ctx context.Context, subscription models.Subscrip
 		return false, nil
 	}
 
-	err = a.sendGameAlertEmail(nextGame, subscription)
+	err = a.sendEmail(nextGame, subscription)
 	if err != nil {
 		return false, fmt.Errorf("failed to send game alert email: %w", err)
 	}
@@ -59,23 +61,7 @@ func (a Alerter) SendGameAlert(ctx context.Context, subscription models.Subscrip
 	return true, nil
 }
 
-type Game struct {
-	Start    time.Time `json:"start"`
-	HomeTeam string    `json:"homeTeam"`
-	AwayTeam string    `json:"awayTeam"`
-	Location string    `json:"location"`
-}
-
-func (g Game) Field() (string, error) {
-	re := regexp.MustCompile(`^.+ - (.+)$`)
-	matches := re.FindStringSubmatch(g.Location)
-	if len(matches) != 2 {
-		return "", fmt.Errorf("failed to extract field from game: %+v", g)
-	}
-	return strings.ToLower(re.FindStringSubmatch(g.Location)[1]), nil
-}
-
-func getNextGame(subscription models.Subscription) (Game, error) {
+func getNextGame(subscription models.Subscription) (models.Game, error) {
 	teamName := subscription.TeamName
 	leagueID := subscription.LeagueID
 	seasonID := subscription.SeasonID
@@ -83,17 +69,17 @@ func getNextGame(subscription models.Subscription) (Game, error) {
 	url := fmt.Sprintf("https://teampages.com/leagues/%s/events.json?calendar=true&season_id=%s", leagueID, seasonID)
 	resp, err := http.Get(url)
 	if err != nil {
-		return Game{}, err
+		return models.Game{}, err
 	}
 	defer resp.Body.Close()
 
-	games := []Game{}
+	games := []models.Game{}
 	err = json.NewDecoder(resp.Body).Decode(&games)
 	if err != nil {
-		return Game{}, err
+		return models.Game{}, err
 	}
 
-	var nextGame Game
+	var nextGame models.Game
 
 	// Games are sorted chronologically. The first game after time.Now() is the next game
 	for _, game := range games {
@@ -110,7 +96,7 @@ func getNextGame(subscription models.Subscription) (Game, error) {
 	return nextGame, nil
 }
 
-func (a Alerter) sendGameAlertEmail(game Game, subscription models.Subscription) error {
+func (a Alerter) sendEmail(game models.Game, subscription models.Subscription) error {
 	field, err := game.Field()
 	if err != nil {
 		return err

@@ -1,23 +1,26 @@
-name: Run Function
+name: Send Game Alerts
 on:
   push:
     branches:
+      - main
       - test-run-function
+  schedule:
+    - cron: "0,30 8-22 * * *"
 jobs:
-  Run-Function:
+  Send Game Alerts:
     runs-on: macos-latest
     timeout-minutes: 2
     steps:
-      - name: Checking out repository
+      - name: Check out repository
         uses: actions/checkout@v4
       - name: Setup go
         uses: actions/setup-go@v5
         with: 
           go-version: '1.22'
-      - name: Installing dependencies
-        run: go install cmd/test/test.go
+      - name: Install dependencies
+        run: go install .
       - name: Run game alerts script
-        run: go run cmd/test/test.go
+        run: go run . | tee output.txt | jq .
         env:
           SFTP_PASS: ${{ secrets.SFTP_PASS }}
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}

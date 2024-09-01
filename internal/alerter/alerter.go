@@ -27,36 +27,36 @@ func New(db db.Database, emailer emailer.Emailer) Alerter {
 	}
 }
 
-func (a Alerter) SendGameAlert(ctx context.Context, subscription models.Subscription) error {
+func (a Alerter) SendGameAlert(ctx context.Context, subscription models.Subscription) (sent bool, err error) {
 	nextGame, err := getNextGame(subscription)
 	if err != nil {
-		return fmt.Errorf("failed to get the next game: %w", err)
+		return false, fmt.Errorf("failed to get the next game: %w", err)
 	}
 	if nextGame == (Game{}) {
-		slog.Info("Next game has not been posted yet")
-		return nil
+		slog.Info("next game has not been posted yet")
+		return false, nil
 	}
 
 	hasSentAlert, err := a.db.HasSentAlert(ctx, subscription.ID, nextGame.Start)
 	if err != nil {
-		return fmt.Errorf("failed to get hasSentAlert: %w", err)
+		return false, fmt.Errorf("failed to get hasSentAlert: %w", err)
 	}
 	if hasSentAlert {
-		slog.Info("Already sent game alert", "nextGame", nextGame)
-		return nil
+		slog.Info("already sent game alert", "subscription_id", subscription.ID)
+		return false, nil
 	}
 
 	err = a.sendGameAlertEmail(nextGame, subscription)
 	if err != nil {
-		return fmt.Errorf("failed to send game alert email: %w", err)
+		return false, fmt.Errorf("failed to send game alert email: %w", err)
 	}
 
 	err = a.db.CreateSentAlert(ctx, subscription.ID, nextGame.Start)
 	if err != nil {
-		return fmt.Errorf("failed to create sent alert: %w", err)
+		return false, fmt.Errorf("failed to create sent alert: %w", err)
 	}
 
-	return nil
+	return true, nil
 }
 
 type Game struct {

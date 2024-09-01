@@ -1,7 +1,6 @@
 package emailer
 
 import (
-	"log/slog"
 	"net/smtp"
 	"os"
 )
@@ -28,7 +27,6 @@ func (e Emailer) SendEmail(toEmail, subject, body string) error {
 	message := []byte("Subject: " + subject + "\r\n\r\n" + body)
 
 	if os.Getenv("ENV") != "prod" {
-		slog.Info("Environment is not production, printing email instead of sending", "email", string(message))
 		return nil
 	}
 

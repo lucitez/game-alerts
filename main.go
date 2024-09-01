@@ -1,4 +1,4 @@
-package gamealerts
+package main
 
 import (
 	"context"
@@ -11,13 +11,16 @@ import (
 	"github.com/lucitez/game-alerts/internal/logger"
 )
 
-func init() {
-	// functions.CloudEvent("SendGameAlerts", SendGameAlerts)
-
+func main() {
 	logger.Init()
+
+	err := sendGameAlerts(context.Background())
+	if err != nil {
+		slog.Error("error sending game alerts", "error", err)
+	}
 }
 
-func SendGameAlerts(ctx context.Context) error {
+func sendGameAlerts(ctx context.Context) error {
 	slog.Info("starting send game alerts function")
 
 	slog.Info("connecting to db")
@@ -25,7 +28,7 @@ func SendGameAlerts(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to create database connection: %w", err)
 	}
-	defer conn.Close(context.Background())
+	defer conn.Close(ctx)
 
 	db := db.New(conn)
 
@@ -40,14 +43,18 @@ func SendGameAlerts(ctx context.Context) error {
 
 	slog.Info("sending game alerts")
 	for _, subscription := range subscriptions {
-		err := alerter.SendGameAlert(ctx, subscription)
+		sent, err := alerter.SendGameAlert(ctx, subscription)
 		if err != nil {
 			slog.Error("failed to send game alert", "error", err, "subscription", subscription)
 			continue
 		}
-		slog.Info("Finished sending game alert", "subscription", subscription)
+		if sent {
+			slog.Info("sent game alert", "subscription_id", subscription.ID)
+			continue
+		}
+		slog.Info("skipped sending game alert", "subscription_id", subscription.ID)
 	}
 
-	slog.Info("Finished sending game alerts")
+	slog.Info("finished sending game alerts")
 	return nil
 }

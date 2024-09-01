@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: go install .
       - name: Run game alerts script
-        run: go run . > out.txt
+        run: go run . 2>&1 | tee out.txt
         env:
           ENV: prod
           SFTP_PASS: ${{ secrets.SFTP_PASS }}

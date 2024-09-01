@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"os"
 
 	"github.com/lucitez/game-alerts/internal/alerter"
 	"github.com/lucitez/game-alerts/internal/db"
@@ -19,7 +20,7 @@ func main() {
 		slog.Error("error sending game alerts", "error", err)
 		panic(err)
 	}
-	panic("TESTING PANIC")
+	os.Exit(1)
 }
 
 func sendGameAlerts(ctx context.Context) error {

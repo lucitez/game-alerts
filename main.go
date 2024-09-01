@@ -19,7 +19,6 @@ func main() {
 		slog.Error("error sending game alerts", "error", err)
 		panic(err)
 	}
-	panic("TESTING")
 }
 
 func sendGameAlerts(ctx context.Context) error {

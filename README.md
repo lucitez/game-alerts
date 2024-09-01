@@ -1,7 +1,6 @@
 # TODOS
 
 - Write tests
-- Figure out how to pipe output to a file while still sending a kill signal to gha
 
 # Development
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -43,19 +44,25 @@ func sendGameAlerts(ctx context.Context) error {
 	emailer := emailer.New()
 	alerter := alerter.New(db, emailer)
 
+	var alerterErrors error
+
 	slog.Info("sending game alerts")
 	for _, subscription := range subscriptions {
 		sent, err := alerter.SendGameAlert(ctx, subscription)
 		if err != nil {
-			// TODO surface errors here
-			slog.Error("failed to send game alert", "error", err, "subscription", subscription)
+			alerterErrors = errors.Join(alerterErrors, fmt.Errorf("failed to send game alert: %w", err))
 			continue
 		}
-		if sent {
-			slog.Info("sent game alert", "subscription_id", subscription.ID)
+		if !sent {
+			slog.Info("skipped sending game alert", "subscription_id", subscription.ID)
 			continue
 		}
-		slog.Info("skipped sending game alert", "subscription_id", subscription.ID)
+
+		slog.Info("sent game alert", "subscription_id", subscription.ID)
+	}
+
+	if alerterErrors != nil {
+		return alerterErrors
 	}
 
 	slog.Info("finished sending game alerts")

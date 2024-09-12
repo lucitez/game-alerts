@@ -23,8 +23,8 @@ jobs:
         run: go run . | tee output.txt | jq . && exit ${PIPESTATUS[0]}
         env:
           ENV: prod
+          SFTP_EMAIL: ${{ secrets.SFTP_EMAIL }}
           SFTP_PASS: ${{ secrets.SFTP_PASS }}
-          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
           DATABASE_USER: ${{ secrets.DATABASE_USER }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
           DATABASE_HOST: ${{ secrets.DATABASE_HOST }}

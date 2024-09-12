@@ -20,6 +20,8 @@ func main() {
 		slog.Error("error sending game alerts", "error", err)
 		os.Exit(1)
 	}
+
+	os.Exit(1)
 }
 
 func sendGameAlerts(ctx context.Context) error {

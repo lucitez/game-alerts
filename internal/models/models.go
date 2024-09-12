@@ -35,3 +35,13 @@ func (g Game) Field() (string, error) {
 	}
 	return strings.ToLower(re.FindStringSubmatch(g.Location)[1]), nil
 }
+
+func (g Game) Time() string {
+	return fmt.Sprintf(
+		"%s, %s %d at %s",
+		g.Start.Weekday().String(),
+		g.Start.Month().String(),
+		g.Start.Day(),
+		g.Start.Format(time.Kitchen),
+	)
+}

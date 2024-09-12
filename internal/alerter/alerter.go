@@ -11,6 +11,8 @@ import (
 	"github.com/lucitez/game-alerts/internal/db"
 	"github.com/lucitez/game-alerts/internal/emailer"
 	"github.com/lucitez/game-alerts/internal/models"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type Emailer interface {
@@ -102,14 +104,20 @@ func (a Alerter) sendEmail(game models.Game, subscription models.Subscription) e
 		return err
 	}
 
-	subject := "Co-ed soccer game"
+	c := cases.Title(language.AmericanEnglish)
+	sendee := c.String(subscription.Coach.Name)
+	if sendee == "" {
+		sendee = subscription.Coach.Email
+	}
+
+	subject := "Soccer game scheduled"
 	body := fmt.Sprintf(
-		"Like if you're playing on %s, %s %d at %s (%s field)\r\n"+
-			"https://teampages.com/leagues/%s/events?season_id=%s?view_mode=list",
-		game.Start.Weekday().String(),
-		game.Start.Month().String(),
-		game.Start.Day(),
-		game.Start.Format(time.Kitchen),
+		"Hello %s,\n\nYour next game has been scheduled for %s.\n\nHere's a text blast to copy and paste:\n\n"+
+			"Like if you're playing on %s (%s field)\n\n"+
+			"TeamPages url: https://teampages.com/leagues/%s/events?season_id=%s?view_mode=list",
+		sendee,
+		game.Time(),
+		game.Time(),
 		field,
 		subscription.LeagueID,
 		subscription.SeasonID,

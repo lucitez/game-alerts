@@ -24,7 +24,7 @@ func New() Emailer {
 func (e Emailer) SendEmail(toEmail, subject, body string) error {
 	auth := smtp.PlainAuth("", e.fromEmail, e.password, "smtp.gmail.com")
 
-	message := []byte("Subject: " + subject + "\r\n\r\n" + body)
+	message := []byte("Subject: " + subject + "\r\n" + body + "\r\n")
 
 	if os.Getenv("ENV") != "prod" {
 		return nil

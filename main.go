@@ -20,8 +20,6 @@ func main() {
 		slog.Error("error sending game alerts", "error", err)
 		os.Exit(1)
 	}
-
-	os.Exit(1)
 }
 
 func sendGameAlerts(ctx context.Context) error {
@@ -49,6 +47,7 @@ func sendGameAlerts(ctx context.Context) error {
 	for _, subscription := range subscriptions {
 		sent, err := alerter.SendGameAlert(ctx, subscription)
 		if err != nil {
+			// TODO surface errors here
 			slog.Error("failed to send game alert", "error", err, "subscription", subscription)
 			continue
 		}

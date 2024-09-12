@@ -3,6 +3,9 @@ on:
   schedule:
     # This runs every 20 minutes from 8AM-10PM PST. Time here is in UTC
     - cron: '*/20 16-23,0-6 * * *'
+  push:
+    branches:
+      - 'main'
 jobs:
   send-game-alerts:
     runs-on: ubuntu-latest

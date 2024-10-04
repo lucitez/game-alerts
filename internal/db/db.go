@@ -94,10 +94,15 @@ func (d Database) CreateSentAlert(ctx context.Context, subscriptionID int, date 
 		VALUES ($1, $2);
 	`
 
-	_, err := d.conn.Query(ctx, query, subscriptionID, date)
+	rows, err := d.conn.Query(ctx, query, subscriptionID, date)
 	if err != nil {
-		return err
+		return fmt.Errorf("error while creating sent alert: %w", err)
 	}
+	rows.Close()
+	if err = rows.Err(); err != nil {
+		return fmt.Errorf("error from rows while creating sent alert: %w", err)
+	}
+
 	return nil
 }
 

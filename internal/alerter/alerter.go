@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"sort"
 	"time"
 
 	"github.com/lucitez/game-alerts/internal/db"
@@ -38,6 +39,10 @@ func (a Alerter) SendGameAlert(ctx context.Context, subscription models.Subscrip
 	}
 	if nextGame == (models.Game{}) {
 		slog.Info("next game has not been posted yet")
+		return false, nil
+	}
+	if nextGame.Start.After(time.Now().Add(time.Hour * 24 * 8)) {
+		slog.Info("next game is more than a week away, holding off for now")
 		return false, nil
 	}
 
@@ -81,9 +86,12 @@ func getNextGame(subscription models.Subscription) (models.Game, error) {
 		return models.Game{}, err
 	}
 
-	var nextGame models.Game
+	// Games are supposed to be sorted chronologically, but sometimes they get out of order
+	sort.Slice(games, func(i, j int) bool {
+		return games[i].Start.Before(games[j].Start)
+	})
 
-	// Games are sorted chronologically. The first game after time.Now() is the next game
+	var nextGame models.Game
 	for _, game := range games {
 		if game.HomeTeam != teamName && game.AwayTeam != teamName {
 			continue

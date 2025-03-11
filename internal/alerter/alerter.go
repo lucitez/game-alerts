@@ -38,11 +38,11 @@ func (a Alerter) SendGameAlert(ctx context.Context, subscription models.Subscrip
 		return false, fmt.Errorf("failed to get the next game: %w", err)
 	}
 	if nextGame == (models.Game{}) {
-		slog.Info("next game has not been posted yet")
+		slog.Info("next game has not been posted yet", "subscription_id", subscription.ID)
 		return false, nil
 	}
 	if nextGame.Start.After(time.Now().Add(time.Hour * 24 * 8)) {
-		slog.Info("next game is more than a week away, holding off for now")
+		slog.Info("next game is more than a week away, holding off for now", "subscription_id", subscription.ID)
 		return false, nil
 	}
 

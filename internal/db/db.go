@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log/slog"
 	"os"
@@ -63,7 +64,7 @@ func (d Database) GetSubscriptions(ctx context.Context) ([]models.Subscription, 
 		var email string
 		var id int
 		var leagueID string
-		var seasonID string
+		var seasonID sql.NullString
 		var teamName string
 
 		if err := rows.Scan(&name, &email, &id, &leagueID, &seasonID, &teamName); err != nil {

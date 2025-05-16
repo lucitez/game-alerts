@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 	"regexp"
 	"strings"
@@ -16,8 +17,22 @@ type Subscription struct {
 	ID       int
 	Coach    Coach
 	LeagueID string
-	SeasonID string
+	SeasonID sql.NullString
 	TeamName string
+}
+
+func (s Subscription) BuildUrl() string {
+	if s.SeasonID.Valid {
+		return fmt.Sprintf("https://teampages.com/leagues/%s/events.json?calendar=true&season_id=%s", s.LeagueID, s.SeasonID.String)
+	}
+	return fmt.Sprintf("https://teampages.com/leagues/%s/events.json?calendar=true", s.LeagueID)
+}
+
+func (s Subscription) BuildHumanUrl() string {
+	if s.SeasonID.Valid {
+		return fmt.Sprintf("https://teampages.com/leagues/%s/events?season_id=%s&view_mode=list", s.LeagueID, s.SeasonID.String)
+	}
+	return fmt.Sprintf("https://teampages.com/leagues/%s/events?view_mode=list", s.LeagueID)
 }
 
 type Game struct {

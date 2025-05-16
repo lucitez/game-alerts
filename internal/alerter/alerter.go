@@ -70,10 +70,8 @@ func (a Alerter) SendGameAlert(ctx context.Context, subscription models.Subscrip
 
 func getNextGame(subscription models.Subscription) (models.Game, error) {
 	teamName := subscription.TeamName
-	leagueID := subscription.LeagueID
-	seasonID := subscription.SeasonID
 
-	url := fmt.Sprintf("https://teampages.com/leagues/%s/events.json?calendar=true&season_id=%s", leagueID, seasonID)
+	url := subscription.BuildUrl()
 	resp, err := http.Get(url)
 	if err != nil {
 		return models.Game{}, err
@@ -119,16 +117,16 @@ func (a Alerter) sendEmail(game models.Game, subscription models.Subscription) e
 	}
 
 	subject := "Soccer game scheduled"
+	url := subscription.BuildHumanUrl()
 	body := fmt.Sprintf(
 		"Hello %s,\n\nYour next game has been scheduled for %s.\n\nHere's a text blast to copy and paste:\n\n"+
 			"Like if you're playing on %s (%s field)\n\n"+
-			"TeamPages url: https://teampages.com/leagues/%s/events?season_id=%s?view_mode=list",
+			"TeamPages url: %s",
 		sendee,
 		game.Time(),
 		game.Time(),
 		field,
-		subscription.LeagueID,
-		subscription.SeasonID,
+		url,
 	)
 
 	err = a.emailer.SendEmail(subscription.Coach.Email, subject, body)

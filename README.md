@@ -1,5 +1,18 @@
 This program checks a pickup soccer league website to check if games have been scheduled, then sends emails to subscribers.
 
+## Migrations
+```shell
+$ supabase migration new <migration_name>
+```
+
+```shell
+$ supabase login
+```
+
+```shell
+$ supabase db push
+```
+
 ## Development
 
 Spin up the supabase db container

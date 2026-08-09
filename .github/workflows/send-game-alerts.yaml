@@ -28,8 +28,8 @@ jobs:
           DATABASE_USER: ${{ secrets.DATABASE_USER }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
           DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
-          DATABASE_NAME: postgres
-          DATABASE_PORT: 5432
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+          DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
       - name: Send logs to aggregator
         if: always()
         run: echo "TODO"

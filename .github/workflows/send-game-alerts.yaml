@@ -7,6 +7,8 @@ on:
     branches:
       - main
       - test-action
+permissions:
+  contents: write
 jobs:
   send-game-alerts:
     runs-on: ubuntu-latest
@@ -14,6 +16,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup go
         uses: actions/setup-go@v7
         with: 
@@ -26,13 +30,13 @@ jobs:
           ENV: prod
           SFTP_EMAIL: ${{ secrets.SFTP_EMAIL }}
           SFTP_PASS: ${{ secrets.SFTP_PASS }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Commit changes
         run: |
-          git remote set-url --push origin https://lucitez:$GITHUB_TOKEN@github.com/lucitez/game-alerts
-          git config --global user.name 'Lucas Gregory'
-          git config --global user.email 'lucitez@users.noreply.github.com'
-          git commit -am "Update send history"
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add internal/database/send_history.json
+          git diff --staged --quiet || git commit -m "Update history log $(date -u +'%Y-%m-%d')"
+          git pull --rebase
           git push
       - name: Send logs to aggregator
         if: always()

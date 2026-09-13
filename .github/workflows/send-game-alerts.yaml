@@ -1,7 +1,7 @@
 name: Send Game Alerts
 on:
   schedule:
-    # This runs every day at 17:00 UTC
+    # This runs every day at 17:00 UTC (9am pacific)
     - cron: '0 17 * * *'
   push:
     branches:
@@ -12,11 +12,11 @@ jobs:
     timeout-minutes: 2
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Setup go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with: 
-          go-version: '1.22'
+          go-version-file: 'go.mod'
       - name: Install dependencies
         run: go install .
       - name: Run game alerts script
@@ -25,11 +25,6 @@ jobs:
           ENV: prod
           SFTP_EMAIL: ${{ secrets.SFTP_EMAIL }}
           SFTP_PASS: ${{ secrets.SFTP_PASS }}
-          DATABASE_USER: ${{ secrets.DATABASE_USER }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
-          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-          DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
       - name: Send logs to aggregator
         if: always()
         run: echo "TODO"

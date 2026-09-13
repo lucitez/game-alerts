@@ -1,6 +1,6 @@
 module github.com/lucitez/game-alerts
 
-go 1.22.0
+go 1.27
 
 require (
 	github.com/jackc/pgx/v5 v5.6.0

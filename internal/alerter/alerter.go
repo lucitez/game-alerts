@@ -9,7 +9,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/lucitez/game-alerts/internal/db"
+	"github.com/lucitez/game-alerts/internal/database"
 	"github.com/lucitez/game-alerts/internal/emailer"
 	"github.com/lucitez/game-alerts/internal/models"
 	"golang.org/x/text/cases"
@@ -21,13 +21,11 @@ type Emailer interface {
 }
 
 type Alerter struct {
-	db      db.Database
 	emailer Emailer
 }
 
-func New(db db.Database, emailer emailer.Emailer) Alerter {
+func New(emailer emailer.Emailer) Alerter {
 	return Alerter{
-		db:      db,
 		emailer: emailer,
 	}
 }
@@ -38,20 +36,20 @@ func (a Alerter) SendGameAlert(ctx context.Context, subscription models.Subscrip
 		return false, fmt.Errorf("failed to get the next game: %w", err)
 	}
 	if nextGame == (models.Game{}) {
-		slog.Info("next game has not been posted yet", "subscription_id", subscription.ID)
+		slog.Info("next game has not been posted yet")
 		return false, nil
 	}
 	if nextGame.Start.After(time.Now().Add(time.Hour * 24 * 8)) {
-		slog.Info("next game is more than a week away, holding off for now", "subscription_id", subscription.ID)
+		slog.Info("next game is more than a week away, holding off for now", "coach_id", subscription.Coach.ID)
 		return false, nil
 	}
 
-	hasSentAlert, err := a.db.HasSentAlert(ctx, subscription.ID, nextGame.Start)
+	hasSentAlert, err := database.HasSentAlert(nextGame.ID, subscription.Coach.ID)
 	if err != nil {
 		return false, fmt.Errorf("failed to get hasSentAlert: %w", err)
 	}
 	if hasSentAlert {
-		slog.Info("already sent game alert", "subscription_id", subscription.ID)
+		slog.Info("already sent game alert", "coach_id", subscription.Coach.ID)
 		return false, nil
 	}
 
@@ -60,9 +58,9 @@ func (a Alerter) SendGameAlert(ctx context.Context, subscription models.Subscrip
 		return false, fmt.Errorf("failed to send game alert email: %w", err)
 	}
 
-	err = a.db.CreateSentAlert(ctx, subscription.ID, nextGame.Start)
+	err = database.UpdateSendHistory(nextGame.ID, subscription.Coach.ID)
 	if err != nil {
-		return false, fmt.Errorf("failed to create sent alert: %w", err)
+		return false, fmt.Errorf("failed to update send history: %w", err)
 	}
 
 	return true, nil

@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"fmt"
 	"regexp"
 	"strings"
@@ -9,33 +8,28 @@ import (
 )
 
 type Coach struct {
+	ID    int
 	Name  string
 	Email string
 }
 
 type Subscription struct {
-	ID       int
 	Coach    Coach
-	LeagueID string
-	SeasonID sql.NullString
+	LeagueID int
+	SeasonID int
 	TeamName string
 }
 
 func (s Subscription) BuildUrl() string {
-	if s.SeasonID.Valid {
-		return fmt.Sprintf("https://teampages.com/leagues/%s/events.json?calendar=true&season_id=%s", s.LeagueID, s.SeasonID.String)
-	}
-	return fmt.Sprintf("https://teampages.com/leagues/%s/events.json?calendar=true", s.LeagueID)
+	return fmt.Sprintf("https://teampages.com/leagues/%d/events.json?calendar=true&season_id=%d", s.LeagueID, s.SeasonID)
 }
 
 func (s Subscription) BuildHumanUrl() string {
-	if s.SeasonID.Valid {
-		return fmt.Sprintf("https://teampages.com/leagues/%s/events?season_id=%s&view_mode=list", s.LeagueID, s.SeasonID.String)
-	}
-	return fmt.Sprintf("https://teampages.com/leagues/%s/events?view_mode=list", s.LeagueID)
+	return fmt.Sprintf("https://teampages.com/leagues/%d/events?season_id=%d&view_mode=list", s.LeagueID, s.SeasonID)
 }
 
 type Game struct {
+	ID       int       `json:"id"`
 	Start    time.Time `json:"start"`
 	HomeTeam string    `json:"homeTeam"`
 	AwayTeam string    `json:"awayTeam"`

@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/lucitez/game-alerts/internal/alerter"
-	"github.com/lucitez/game-alerts/internal/db"
+	"github.com/lucitez/game-alerts/internal/database"
 	"github.com/lucitez/game-alerts/internal/emailer"
 	"github.com/lucitez/game-alerts/internal/logger"
 )
@@ -26,23 +26,14 @@ func main() {
 func sendGameAlerts(ctx context.Context) error {
 	slog.Info("starting send game alerts function")
 
-	slog.Info("connecting to db")
-	conn, err := db.CreateConnection(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to create database connection: %w", err)
-	}
-	defer conn.Close(ctx)
-
-	db := db.New(conn)
-
 	slog.Info("getting active subscriptions")
-	subscriptions, err := db.GetSubscriptions(ctx)
+	subscriptions, err := database.GetSubscriptions()
 	if err != nil {
 		return fmt.Errorf("failed to get active subscriptions: %w", err)
 	}
 
 	emailer := emailer.New()
-	alerter := alerter.New(db, emailer)
+	alerter := alerter.New(emailer)
 
 	var alerterErrors error
 
@@ -54,11 +45,11 @@ func sendGameAlerts(ctx context.Context) error {
 			continue
 		}
 		if !sent {
-			slog.Info("skipped sending game alert", "subscription_id", subscription.ID)
+			slog.Info("skipped sending game alert", "coach_id", subscription.Coach.ID)
 			continue
 		}
 
-		slog.Info("sent game alert", "subscription_id", subscription.ID)
+		slog.Info("sent game alert", "coach_id", subscription.Coach.ID)
 	}
 
 	if alerterErrors != nil {

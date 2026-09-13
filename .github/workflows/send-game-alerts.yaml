@@ -5,7 +5,8 @@ on:
     - cron: '0 17 * * *'
   push:
     branches:
-      - 'main'
+      - main
+      - test-action
 jobs:
   send-game-alerts:
     runs-on: ubuntu-latest
@@ -25,6 +26,12 @@ jobs:
           ENV: prod
           SFTP_EMAIL: ${{ secrets.SFTP_EMAIL }}
           SFTP_PASS: ${{ secrets.SFTP_PASS }}
+      - name: Commit changes
+        run: |
+          git config --global user.name 'Lucas Gregory'
+          git config --global user.email 'lucitez@users.noreply.github.com'
+          git commit -am "Update send history"
+          git push
       - name: Send logs to aggregator
         if: always()
         run: echo "TODO"
